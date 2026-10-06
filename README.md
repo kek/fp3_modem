@@ -91,8 +91,9 @@ the power manager.
 - `start_powering_off/1` stops that task, sends
   `:persistent_low_power` (if DMS is reachable) so the modem detaches
   from the network, and gives it 5 s.
-- `power_off/1` stops the task, sends a best-effort `:offline`, and keeps
-  the modem off for at least 2 s.
+- `power_off/1` stops the task, sends a best-effort `:low_power`, and
+  keeps the modem off for at least 2 s. `:offline` would need a modem
+  reset before `:online` is accepted again.
 
 No callback raises or blocks on QMI, so a missing modem or QMI service
 can't crash VintageNet's power manager.

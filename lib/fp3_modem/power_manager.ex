@@ -75,8 +75,10 @@ defmodule Fp3Modem.PowerManager do
       the modem can detach from the network), and asks VintageNet to
       wait 5 s before `power_off/1`.
     * `power_off/1` stops the task, sends a best-effort
-      `set_operating_mode(:offline)` in the background, and keeps the
-      modem off for at least 2 s.
+      `set_operating_mode(:low_power)` in the background, and keeps the
+      modem off for at least 2 s. Not `:offline`: the modem only leaves
+      that mode through a reset, so the next `power_on/1` would fail
+      with `:invalid_transition` until the phone reboots.
     * `handle_info/2` ignores all messages.
 
   No callback raises or blocks on QMI.
@@ -155,7 +157,7 @@ defmodule Fp3Modem.PowerManager do
   def power_off(state) do
     Logger.info("[Fp3Modem.PowerManager] power_off for #{state.ifname}")
     state = stop_online_task(state)
-    {:ok, _} = Task.start(fn -> set_mode_if_ready(state.qmi, :offline) end)
+    {:ok, _} = Task.start(fn -> set_mode_if_ready(state.qmi, :low_power) end)
     {:ok, state, @min_power_off_time}
   end
 
